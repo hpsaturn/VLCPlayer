@@ -7,11 +7,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.widget.FrameLayout;
-
 import org.videolan.libvlc.IVideoPlayer;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.LibVlcException;
@@ -29,11 +26,8 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer, TextureV
 
     private TextureView mSurfaceView;
     private FrameLayout mSurfaceFrame;
-    private SurfaceHolder mSurfaceHolder;
-    private Surface mSurface = null;
 
     private LibVLC mLibVLC;
-
     private String mMediaUrl;
 
     @Override
@@ -67,7 +61,6 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer, TextureV
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         // MediaCodec opaque direct rendering should not be used anymore since there is no surface to attach.
         mLibVLC.stop();
     }
@@ -99,9 +92,7 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer, TextureV
     @Override
     public void setSurfaceLayout(final int width, final int height, int visible_width, int visible_height, final int sar_num, int sar_den){
         Log.d(TAG, "setSurfaceSize -- START");
-        if (width * height == 0)
-            return;
-
+        if (width * height == 0) return;
         // store video size
         mVideoHeight = height;
         mVideoWidth = width;
@@ -109,8 +100,10 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer, TextureV
         mVideoVisibleWidth = visible_width;
         mSarNum = sar_num;
         mSarDen = sar_den;
-
-        Log.d(TAG, "setSurfaceSize -- mMediaUrl: " + mMediaUrl + " mVideoHeight: " + mVideoHeight + " mVideoWidth: " + mVideoWidth + " mVideoVisibleHeight: " + mVideoVisibleHeight + " mVideoVisibleWidth: " + mVideoVisibleWidth + " mSarNum: " + mSarNum + " mSarDen: " + mSarDen);
+        Log.d(TAG, "smMediaUrl: " + mMediaUrl);
+        Log.d(TAG, "mVideoHeight: " + mVideoHeight + " mVideoWidth: " + mVideoWidth);
+        Log.d(TAG, "mVideoVisibleHeight: " + mVideoVisibleHeight + " mVideoVisibleWidth: " +
+                mVideoVisibleWidth + " mSarNum: " + mSarNum + " mSarDen: " + mSarDen);
     }
 
     @Override
