@@ -1,6 +1,7 @@
 package windylabs.com.vlcplayersample;
 
 import android.app.Activity;
+import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -8,13 +9,14 @@ import android.view.MenuItem;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.widget.FrameLayout;
 
 import org.videolan.libvlc.IVideoPlayer;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.LibVlcException;
 
-public class VideoVLCActivity extends Activity implements IVideoPlayer {
+public class VideoVLCActivity extends Activity implements IVideoPlayer, TextureView.SurfaceTextureListener {
     private static final String TAG = VideoVLCActivity.class.getSimpleName();
 
     // size of the video
@@ -25,7 +27,7 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer {
     private int mSarNum;
     private int mSarDen;
 
-    private SurfaceView mSurfaceView;
+    private TextureView mSurfaceView;
     private FrameLayout mSurfaceFrame;
     private SurfaceHolder mSurfaceHolder;
     private Surface mSurface = null;
@@ -40,8 +42,8 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer {
         Log.d(TAG, "VideoVLC -- onCreate -- START ------------");
         setContentView(R.layout.activity_video_vlc);
 
-        mSurfaceView = (SurfaceView) findViewById(R.id.player_surface);
-        mSurfaceHolder = mSurfaceView.getHolder();
+        mSurfaceView = (TextureView) findViewById(R.id.player_surface);
+//        mSurfaceHolder = mSurfaceView.getHolder();
 
         mSurfaceFrame = (FrameLayout) findViewById(R.id.player_surface_frame);
         mMediaUrl = getIntent().getExtras().getString("videoUrl");
@@ -51,16 +53,15 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer {
             mLibVLC.setAout(mLibVLC.AOUT_AUDIOTRACK);
             mLibVLC.setVout(mLibVLC.VOUT_ANDROID_SURFACE);
             mLibVLC.setHardwareAcceleration(LibVLC.HW_ACCELERATION_FULL);
-
             mLibVLC.init(getApplicationContext());
         } catch (LibVlcException e){
             Log.e(TAG, e.toString());
         }
 
-        mSurface = mSurfaceHolder.getSurface();
+//        mSurface = mSurfaceHolder.getSurface();
 
-        mLibVLC.attachSurface(mSurface, VideoVLCActivity.this);
-        mLibVLC.playMRL(mMediaUrl);
+        mSurfaceView.setSurfaceTextureListener(this);
+
     }
 
     @Override
@@ -115,5 +116,27 @@ public class VideoVLCActivity extends Activity implements IVideoPlayer {
     @Override
     public int configureSurface(android.view.Surface surface, int i, int i1, int i2){
         return -1;
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
+        mLibVLC.attachSurface(new Surface(surfaceTexture), VideoVLCActivity.this);
+        mLibVLC.playMRL(mMediaUrl);
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+        Log.d(TAG,"onSurfaceTextureUpdated: "+mSurfaceView.getBitmap().toString());
+
     }
 }
